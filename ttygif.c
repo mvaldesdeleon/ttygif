@@ -121,10 +121,18 @@ take_snapshot_darwin(const char *img_path, Options o)
 {
     static char cmd [256];
 
-    if (sprintf(cmd,
-            "screencapture -l$(osascript -e 'tell app \"%s\" to id of window 1' 2> /dev/null) -o -m %s &> /dev/null",
-            o.terminal_app, img_path) < 0) {
-        return -1;
+    if (o.window_id == NULL || !strlen(o.window_id)) {
+        if (sprintf(cmd,
+                "screencapture -l$(osascript -e 'tell app \"%s\" to id of window 1' 2> /dev/null) -o -m %s &> /dev/null",
+                o.terminal_app, img_path) < 0) {
+            return -1;
+        }
+    } else {
+        if (sprintf(cmd,
+                "screencapture -l %s -o -m %s &> /dev/null",
+                o.window_id, img_path) < 0) {
+            return -1;
+        }
     }
 
     if (system(cmd) != 0) {
